@@ -1,6 +1,8 @@
 
 import sqlite3
 
+from flask import jsonify
+
 def init_db():
     """Initialize the database and create tables"""
     conn = sqlite3.connect('piggybank.db')
@@ -71,6 +73,21 @@ def get_user_by_username(username):
         print(f"Error finding user: {e}")
         return None
 
+def get_all_users():
+        conn = sqlite3.connect('piggybank.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users")
+        rows = cursor.fetchall()
+        users = [
+             {
+                "user.id":r[0],
+                "username":r[1],
+                "name":r[2],
+                "balance":r[3]
+            } for r in rows
+        ]
+        return users
+
 def update_balance(username, amount):
     """Update user's balance (positive for deposit, negative for withdrawal)"""
     try:
@@ -93,18 +110,28 @@ def update_balance(username, amount):
         return False
 
 def delete_user(username):
-
     try:
             conn = sqlite3.connect('piggybank.db')
             cursor = conn.cursor()
-            
             cursor.execute(
                 "DELETE FROM users WHERE username = ?",
                 (username,))
             conn.commit()
-            rows_deleted = cursor.rowcount
             conn.close()
-            return rows_deleted > 0        
+            return True        
     except Exception as e:
             print(f"Error deleting user: {e}")
+            return False
+
+def clean_wipe_user_db():
+    try:
+            conn = sqlite3.connect('piggybank.db')
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM users")
+            cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")
+            conn.commit()
+            conn.close()
+            return True
+    except Exception as e:
+            print(f"Error: {e}")
             return False
