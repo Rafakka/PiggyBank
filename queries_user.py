@@ -1,4 +1,4 @@
-# queries_user.py
+
 import sqlite3
 
 def init_db():
@@ -49,7 +49,7 @@ def get_user_by_username(username):
     """Get user by username and return as dictionary"""
     try:
         conn = sqlite3.connect('piggybank.db')
-        conn.row_factory = sqlite3.Row  # This enables dictionary-like access
+        conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
         cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
@@ -57,7 +57,6 @@ def get_user_by_username(username):
         conn.close()
         
         if user:
-            # Convert to dictionary for easier access
             user_dict = {
                 'id': user['id'],
                 'username': user['username'],
