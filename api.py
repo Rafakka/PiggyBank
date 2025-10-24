@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from pydantic import BaseModel, ValidationError
 
-from queries_user import clean_wipe_user_db, create_user, delete_user, get_all_users, get_user_by_username
+from queries_user import clean_wipe_user_db, create_user, delete_user, get_all_users, get_user_by_user_id, get_user_by_username, update_balance
 
 app = Flask(__name__)
 
@@ -57,6 +57,28 @@ def delete_user_endpoint(username):
     
     except ValidationError as e:
         return jsonify({"error":e.errors}), 400
+
+@app.route("/deposit_money/", methods=["POST"])
+def update_balance_endpoint(username,amount):
+    try:
+        data = request.get_json()
+
+        user_id = data.get("user_id")
+        amount = data.get("amount")
+
+        if amount is not int or float:
+            return jsonify({"error":"Amount não é numero."})
+
+        user_dict = get_user_by_user_id(user_id)
+
+        if user_dict is None:
+            return jsonify({"error":"Usuario nao encontrado."})
+        
+        
+
+        return data
+    except ValidationError as e:
+        return jsonify({"error":e.errors})
 
 @app.route("/get_all_users", methods=["GET"])
 def get_all_users_endpoint():

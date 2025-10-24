@@ -73,6 +73,32 @@ def get_user_by_username(username):
         print(f"Error finding user: {e}")
         return None
 
+def get_user_by_user_id(user_id):
+    try:
+        conn = sqlite3.connect('piggybank.db')
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id))
+        user = cursor.fetchone()
+        conn.close()
+        
+        if user:
+            user_dict = {
+                'id': user['id'],
+                'username': user['username'],
+                'name': user['name'],
+                'balance': user['balance']
+            }
+            return user_dict
+        else:
+            return None
+            
+    except Exception as e:
+        print(f"Error finding user: {e}")
+        return None
+
+
 def get_all_users():
         conn = sqlite3.connect('piggybank.db')
         cursor = conn.cursor()
@@ -89,7 +115,6 @@ def get_all_users():
         return users
 
 def update_balance(username, amount):
-    """Update user's balance (positive for deposit, negative for withdrawal)"""
     try:
         conn = sqlite3.connect('piggybank.db')
         cursor = conn.cursor()
